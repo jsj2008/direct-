@@ -29,6 +29,7 @@ public class UserController {
     @RequestMapping(value = "/add", produces = {"application/json;charset=UTF-8"})
     public int addUser(Tuser tuser){
         System.out.println(tuser.getPassword()+"==>"+tuser.getPhone()+"==>"+tuser.getUserName()+"==>"+tuser.getUserId());
+        System.out.println("==端口1112===");
         return tuserService.addUser(tuser);
     }
     @ResponseBody

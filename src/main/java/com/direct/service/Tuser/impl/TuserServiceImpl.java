@@ -16,7 +16,7 @@ import java.util.List;
 public class TuserServiceImpl implements TuserService {
 
     @Autowired
-    private TuserMapper tuserMapper;//这里会报错，但是并不会影响
+    private TuserMapper tuserMapper;
 
     @Override
     public int addUser(Tuser tuser) {
