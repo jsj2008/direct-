@@ -30,16 +30,15 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="file://$MODULE_DIR$/../jar_module" />
+          <root url="file://$MODULE_DIR$/lib" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
-        <jarDirectory url="file://$MODULE_DIR$/../jar_module" recursive="false" />
+        <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
       </library>
     </orderEntry>
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-jdbc:1.5.6.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter:1.5.6.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot:1.5.6.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-logging:1.5.6.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:1.1.11" level="project" />
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:1.1.11" level="project" />
@@ -131,10 +130,31 @@
     <orderEntry type="library" name="Maven: org.xerial:sqlite-jdbc:3.15.1" level="project" />
     <orderEntry type="library" name="Maven: com.jgoodies:jgoodies-binding:2.10.0" level="project" />
     <orderEntry type="library" name="Maven: com.jgoodies:jgoodies-common:1.7.0" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-devtools:1.5.6.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot:1.5.6.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.bitbucket.b_c:jose4j:0.6.3" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.25" level="project" />
+    <orderEntry type="library" name="Maven: org.jdom:jdom:2.0.2" level="project" />
     <orderEntry type="library" name="Maven: net.minidev:json-smart:2.3" level="project" />
     <orderEntry type="library" name="Maven: net.minidev:accessors-smart:1.2" level="project" />
     <orderEntry type="library" name="Maven: org.ow2.asm:asm:5.0.4" level="project" />
+    <orderEntry type="module-library">
+      <library name="Maven: org.bouncycastle:bcprov-jdk15:1.46">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/bcprov-jdk15-1.46.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Maven: sys:lib:1">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/fastjson-1.2.47.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
