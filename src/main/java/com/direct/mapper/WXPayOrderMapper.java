@@ -15,7 +15,11 @@ public interface WXPayOrderMapper {
 
     int updateByPrimaryKeySelective(WXPayOrder record);
 
+    int updateByNotifySelective(WXPayOrder record);
+
     int updateByPrimaryKey(WXPayOrder record);
 
-    List<WXPayOrder> selectByOpenid(String openid);
+    List<WXPayOrder> selectByOutTradeNo(String outTradeNo);
+
+    List<WXPayOrder> selectByNotify(WXPayOrder order);
 }

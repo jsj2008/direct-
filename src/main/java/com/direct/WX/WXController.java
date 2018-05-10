@@ -172,7 +172,7 @@ public class WXController {
             //获取客户端的ip地址
             String spbill_create_ip = IpUtils.getIpAddr(request);
             //生成订单号
-            String orderId=new SimpleDateFormat("yyyyMMddHHddss").format(new Date())+ StringUtils.getRandomStringByLength(10);
+            String orderId="wxp"+new SimpleDateFormat("yyyyMMddHHddss").format(new Date())+ StringUtils.getRandomStringByLength(10);
             logger.info(" nonce_str:"+nonce_str+"+spbill_create_ip:"+spbill_create_ip);
             //组装参数，用户生成统一下单接口的签名
             Map<String, String> packageParams = new HashMap<String, String>();
@@ -212,9 +212,12 @@ public class WXController {
             // 将解析结果存储在HashMap中
             Map map = PayUtil.doXMLParse(result);
 
-            String return_code = (String) map.get("return_code");//返回状态码
-
-            Map<String, Object> response = new HashMap<String, Object>();//返回给小程序端需要的参数
+            //返回状态码
+            String return_code = (String) map.get("return_code");
+            //返回给小程序端需要的参数
+            Map<String, Object> response = new HashMap<String, Object>();
+            //待支付订单
+            WXPayOrder order = new WXPayOrder();
             if(return_code=="SUCCESS"||return_code.equals(return_code)){
                 String prepay_id = (String) map.get("prepay_id");//返回的预付单信息
                 response.put("nonceStr", nonce_str);
@@ -227,6 +230,22 @@ public class WXController {
                 String paySign = PayUtil.sign(stringSignTemp, WxPayConfig.key, "utf-8").toUpperCase();
 
                 response.put("paySign", paySign);
+                //插入待支付订单
+                order.setAppid(WxPayConfig.APPID);
+                order.setMchId(WxPayConfig.mch_id);
+                order.setOpenid(openid);
+                order.setTotalFee(Integer.valueOf(total_fee)/100);
+                order.setOutTradeNo(orderId);
+                //0 待支付
+                //1 支付成功
+                order.setState(0);
+                List<WXPayOrder> resOrder=orderService.selectByOutTradeNo(orderId);
+                logger.info(" 待支付订单 order:"+order+"resOrder: "+resOrder +"=="+resOrder.isEmpty());
+                if (resOrder.isEmpty()){
+                    orderService.insertSelective(order);
+                }else{
+                        logger.error("！！！！！订单已经存在");
+                }
             }
 
             response.put("appid", WxPayConfig.APPID);
@@ -239,7 +258,7 @@ public class WXController {
     }
 
     /**
-     * @Description:微信支付
+     * @Description:微信支付结果通知
      * @return
      * @throws Exception
      */
@@ -249,55 +268,71 @@ public class WXController {
         BufferedReader br = new BufferedReader(new InputStreamReader((ServletInputStream) request.getInputStream()));
         String line = null;
         StringBuilder sb = new StringBuilder();
+        WXPayOrder order = new WXPayOrder();
         while ((line = br.readLine()) != null) {
             sb.append(line);
         }
 
-        /*
-        测试
-        */
-        WXPayOrder order = new WXPayOrder();
-        order.setOpenid("123121131");
-        List<WXPayOrder> xx=orderService.selectByOpenid("123456");
-        logger.info("xx: "+xx +"=="+xx.isEmpty());
-        if (xx.isEmpty()){
-            orderService.insertSelective(order);
-        }
-
         br.close();
         //sb为微信返回的xml
-        String notityXml = sb.toString();
+        String notityXml = String.valueOf(sb);
         String resXml = "";
         logger.info("接收到的报文：" + notityXml);
 
+        /*
+        * 测试
+        * */
         Map map = PayUtil.doXMLParse(notityXml);
-
+        String aa = map.get("return_code") == null?"0":map.get("return_code").toString();
+        System.out.println(aa);
         String returnCode = (String) map.get("return_code");
         if("SUCCESS".equals(returnCode)){
             //验证签名是否正确
-            if(PayUtil.verify(PayUtil.createLinkString(map), (String)map.get("sign"), WxPayConfig.key, "utf-8")){
 
-                logger.info("=======================支付成功======================");
+    logger.info("效验 "+PayUtil.verify(PayUtil.createLinkString(PayUtil.paraFilter(map)), (String)map.get("sign"), WxPayConfig.key, "utf-8"));
+    logger.info("效验 "+PayUtil.createLinkString(map), (String)map.get("sign"), WxPayConfig.key, "utf-8");
+            if(PayUtil.verify(PayUtil.createLinkString(PayUtil.paraFilter(map)), (String)map.get("sign"), WxPayConfig.key, "utf-8")){
+                logger.info("=======================支付成功通知======================");
+                order.setAppid(String.valueOf(map.get("appid")));
+                order.setMchId((String)map.get("mch_id"));
+                order.setResultCode((String)map.get("result_code"));
+                order.setErrCode((String)map.get("err_code"));
+                order.setErrCodeDes((String)map.get("err_code_des"));
+                order.setOpenid((String)map.get("openid"));
+                order.setTotalFee(Integer.valueOf(String.valueOf(map.get("total_fee")))/100);
+                order.setOutTradeNo((String)map.get("out_trade_no"));
+                order.setTransactionId((String)map.get("transaction_id"));
+                order.setTimeEnd((String)map.get("time_end"));
+                order.setState(1);
+                List<WXPayOrder> resOrder=orderService.selectByOutTradeNo((String)map.get("out_trade_no");
+                logger.info("order:"+order+"resOrder: "+resOrder +"=="+resOrder.isEmpty()+"openid:"+(String)map.get("openid"));
+                if (resOrder.isEmpty()){
+                    //更新订单 成功
+                    orderService.updateByNotifySelective(order);
+                }else{
+                    //插入
+                    logger.error("！！！！！异常 订单不存在 order"+order);
+                    orderService.insertSelective(order);
+                }
 
                 //通知微信服务器已经支付成功
-                resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"
-                        + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
+                resXml = "<xml>" +
+                           "<return_code><![CDATA[SUCCESS]]></return_code>" +
+                          "<return_msg><![CDATA[OK]]></return_msg>" +
+                        "</xml>";
             }
         }else{
             resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"
                     + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
         }
-        logger.info("resXml:"+resXml);
-        logger.info("微信支付回调数据结束");
+        logger.info("微信支付回调数据结束 resXml:"+resXml);
+        //商户处理后同步返回给微信
+        String result = PayUtil.httpRequest(WxPayConfig.pay_url, "POST", resXml);
+        logger.info("商户处理后同步返回给微信 返回XML数据：" + result);
 
-
-        BufferedOutputStream out = new BufferedOutputStream(
-                response.getOutputStream());
-        out.write(resXml.getBytes());
-        out.flush();
-        out.close();
     }
-        /*
+
+    /*
     *
     * */
     private byte[] decrypt(byte[] content, byte[] keyByte, byte[] ivByte) throws InvalidAlgorithmParameterException {

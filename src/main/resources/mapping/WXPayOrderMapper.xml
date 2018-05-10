@@ -26,12 +26,44 @@
     where id = #{id,jdbcType=INTEGER}
   </select>
   <!--添加 start-->
-  <select id="selectByOpenid" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <select id="selectByOutTradeNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
     <include refid="Base_Column_List" />
     from wx_pay_order
-    where openId = #{openId,jdbcType=VARCHAR}
+    where out_trade_no = #{outTradeNo,jdbcType=VARCHAR}
   </select>
+  <!-- 支付成功通知查询-->
+  <select id="selectByNotify" resultMap="BaseResultMap" parameterType="com.direct.model.WXPayOrder" >
+    select
+    <include refid="Base_Column_List" />
+    from wx_pay_order
+    where out_trade_no = #{outTradeNo,jdbcType=VARCHAR} and appid = #{appid,jdbcType=VARCHAR} and mch_id = #{mchId,jdbcType=VARCHAR}
+  </select>
+  <!-- 支付成功通知更新-->
+  <update id="updateByNotifySelective" parameterType="com.direct.model.WXPayOrder" >
+    update wx_pay_order
+    <set >
+      <if test="resultCode != null" >
+        result_code = #{resultCode,jdbcType=VARCHAR},
+      </if>
+      <if test="errCode != null" >
+        err_code = #{errCode,jdbcType=VARCHAR},
+      </if>
+      <if test="errCodeDes != null" >
+        err_code_des = #{errCodeDes,jdbcType=VARCHAR},
+      </if>
+      <if test="transactionId != null" >
+        transaction_id = #{transactionId,jdbcType=VARCHAR},
+      </if>
+      <if test="timeEnd != null" >
+        time_end = #{timeEnd,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=INTEGER},
+      </if>
+    </set>
+    where out_trade_no = #{outTradeNo,jdbcType=VARCHAR} and appid = #{appid,jdbcType=VARCHAR} and mch_id = #{mchId,jdbcType=VARCHAR}
+  </update>
   <!--添加 end-->
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from wx_pay_order

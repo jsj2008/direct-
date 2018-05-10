@@ -21,8 +21,17 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<WXPayOrder> selectByOpenid(String openid) {
-        return orderMapper.selectByOpenid(openid);
+    public List<WXPayOrder> selectByOutTradeNo(String openid) {
+        return orderMapper.selectByOutTradeNo(openid);
     }
 
+    @Override
+    public List<WXPayOrder> selectByNotify(WXPayOrder order) {
+        return orderMapper.selectByNotify(order);
+    }
+
+    @Override
+    public int updateByNotifySelective(WXPayOrder order) {
+        return orderMapper.updateByNotifySelective(order);
+    }
 }
