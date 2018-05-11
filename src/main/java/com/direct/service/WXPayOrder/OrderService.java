@@ -8,7 +8,7 @@ public interface OrderService {
 
     int insertSelective(WXPayOrder order);
 
-    List<WXPayOrder> selectByOutTradeNo(String openid);
+    List<WXPayOrder> selectByOutTradeNo(String tradeNo);
 
     List<WXPayOrder> selectByNotify(WXPayOrder order);
 

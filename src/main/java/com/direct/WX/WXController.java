@@ -1,13 +1,12 @@
 package com.direct.WX;
 
 import com.direct.common.constant.WxPayConfig;
-import com.direct.model.User;
-import com.direct.model.WXPayOrder;
-import com.direct.model.WeChatAppLoginReq;
+import com.direct.model.*;
 //import net.sf.json.JSONObject;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.direct.service.WXPayOrder.OrderService;
+import com.direct.service.gameOrder.gameOrderService;
 import com.direct.service.user.UserService;
 import com.direct.utils.HmacUtil;
 import com.direct.utils.IpUtils;
@@ -55,8 +54,14 @@ public class WXController {
     @Autowired
     private UserService userService;
 
+    //支付订单
     @Autowired
     private OrderService orderService;
+
+    //游戏订单
+    @Autowired
+    private gameOrderService gameOrderService;
+
 
     private static final Logger logger = LoggerFactory.getLogger(WXController.class);
 
@@ -66,12 +71,6 @@ public class WXController {
     @RequestMapping(value = "/login", produces = {"application/json;charset=UTF-8"})
     public Map<String,Object> login(WeChatAppLoginReq WxData){
 
-//        logger.info("code "+ WxData.getCode() +
-//                "getState "+ WxData.getState() +
-//                "getRawData "+ WxData.getRawData() +
-//                "getEncryptedData "+ WxData.getEncryptedData() +
-//                "getIv "+ WxData.getIv()+
-//                "getSignature "+ WxData.getSignature());
         String openId="";
         String url = "https://api.weixin.qq.com/sns/jscode2session?appid="+WxPayConfig.APPID+"&secret="+WxPayConfig.SECRET+"&js_code="+WxData.getCode()+"&grant_type=authorization_code";
         RestTemplate restTemplate = new RestTemplate();
@@ -163,8 +162,34 @@ public class WXController {
      */
     @ResponseBody
     @RequestMapping(value = "/wxPay", produces = {"application/json;charset=UTF-8"})
-    public Map<String,Object> wxPay(String openid,String name,String total_fee,HttpServletRequest request){
+    public Map<String,Object> wxPay(GameOrder_param gameOrder, HttpServletRequest request){
         try{
+            //订单金额需要 调用方法后生成 前端只允许传下单类型
+            String openid =gameOrder.getOpenid();
+            String name ="测试商品名称_1 等带 价格方法完成后修改";
+            int total_fee=1;
+
+//测试
+logger.info("接受值查看"+
+        " openid "+gameOrder.getOpenid()+
+        " phone "+gameOrder.getPhone()+
+        " trainertime 陪玩时间 "+gameOrder.getTrainertime()+
+        " contype1 陪练模式 "+gameOrder.getContype1()+
+        " ordertype 订单类型 0：排位 1：定位 2：等级 3：陪玩 "+gameOrder.getOrdertype()+
+        " boostertype 价格区别标识 代练 "+gameOrder.getBoostertype()+
+        " accompanytype 价格区别标识 陪玩 "+gameOrder.getAccompanytype()+
+        " currentpar 当前段位 "+gameOrder.getCurrentpar()+
+        " targetpar 目标段位 "+gameOrder.getTargetpar()+
+        " inscriptiongrade 铭文等级-王者荣耀 "+gameOrder.getInscriptiongrade()+
+        " positioningmatch1 上赛季段位 "+gameOrder.getPositioningmatch1()+
+        " positioningmatch2 胜场数 "+gameOrder.getPositioningmatch2()+
+        " currentgrade 当前等级 "+gameOrder.getCurrentgrade()+
+        " targetgrade 目标等级 "+gameOrder.getTargetgrade()+
+        " displacementtype 0：单双排 1：灵活组排 -lol "+gameOrder.getDisplacementtype()+
+        " issupplement 是否补分 -lol "+gameOrder.getIssupplement()+
+        ""
+);
+
             //生成的随机字符串
             String nonce_str = StringUtils.getRandomStringByLength(32);
             //商品名称
@@ -181,7 +206,7 @@ public class WXController {
             packageParams.put("nonce_str", nonce_str);
             packageParams.put("body", body);
             packageParams.put("out_trade_no", orderId);//商户订单号
-            packageParams.put("total_fee", total_fee);//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+            packageParams.put("total_fee", String.valueOf(total_fee));//支付金额，这边需要转成字符串类型，否则后面的签名会失败
             packageParams.put("spbill_create_ip", spbill_create_ip);
             packageParams.put("notify_url", WxPayConfig.notify_url);//支付成功后的回调地址
             packageParams.put("trade_type", WxPayConfig.TRADETYPE);//支付方式
@@ -216,9 +241,9 @@ public class WXController {
             String return_code = (String) map.get("return_code");
             //返回给小程序端需要的参数
             Map<String, Object> response = new HashMap<String, Object>();
-            //待支付订单
-            WXPayOrder order = new WXPayOrder();
             if(return_code=="SUCCESS"||return_code.equals(return_code)){
+                //待支付订单
+                WXPayOrder order = new WXPayOrder();
                 String prepay_id = (String) map.get("prepay_id");//返回的预付单信息
                 response.put("nonceStr", nonce_str);
                 response.put("package", "prepay_id=" + prepay_id);
@@ -234,7 +259,7 @@ public class WXController {
                 order.setAppid(WxPayConfig.APPID);
                 order.setMchId(WxPayConfig.mch_id);
                 order.setOpenid(openid);
-                order.setTotalFee(Integer.valueOf(total_fee)/100);
+                order.setTotalFee(total_fee/100);
                 order.setOutTradeNo(orderId);
                 //0 待支付
                 //1 支付成功
@@ -244,7 +269,75 @@ public class WXController {
                 if (resOrder.isEmpty()){
                     orderService.insertSelective(order);
                 }else{
-                        logger.error("！！！！！订单已经存在");
+                        logger.error("！！！！！ 支付订单 订单已经存在");
+                }
+
+                //插入业务订单（游戏订单）
+                GameOrder g_order = new GameOrder();
+                g_order.setOpenid(openid);
+                g_order.setOrderid(orderId);
+                g_order.setPaytype("0");
+                g_order.setTotalFee(total_fee/100);
+                //待支付：0 	1：支付成功
+                g_order.setState("0");
+                g_order.setCreatedtime(new Date());
+                //
+                g_order.setPhone(gameOrder.getPhone());
+                //陪玩时间
+                g_order.setTrainertime(gameOrder.getTrainertime());
+                //陪练模式 打错字了=.=
+                g_order.setContype1(gameOrder.getContype1());
+                //订单类型 0：排位 1：定位 2：等级 3：陪玩
+                g_order.setOrdertype(gameOrder.getOrdertype());
+                //价格区别标识 代练
+                g_order.setBoostertype(gameOrder.getBoostertype());
+                //价格区别标识 陪玩
+                g_order.setAccompanytype(gameOrder.getAccompanytype());
+                //当前段位
+                g_order.setCurrentpar(gameOrder.getCurrentpar());
+                //目标段位
+                g_order.setTargetpar(gameOrder.getTargetpar());
+                //铭文等级-王者荣耀
+                g_order.setInscriptiongrade(gameOrder.getInscriptiongrade());
+                //上赛季段位
+                g_order.setPositioningmatch1(gameOrder.getPositioningmatch1());
+                //胜场数
+                g_order.setPositioningmatch2(gameOrder.getPositioningmatch2());
+                //当前等级
+                g_order.setCurrentgrade(gameOrder.getCurrentgrade());
+                //目标等级
+                g_order.setTargetgrade(gameOrder.getTargetgrade());
+                //0：单双排 1：灵活组排 -lol
+                g_order.setDisplacementtype(gameOrder.getDisplacementtype());
+                //是否补分 -lol
+                g_order.setIssupplement(gameOrder.getIssupplement());
+logger.info("g_order "+g_order);
+//测试
+                logger.info(" 接受值查看"+
+                        " openid "+g_order.getOpenid()+
+                        " phone "+g_order.getPhone()+
+                        " trainertime 陪玩时间 "+g_order.getTrainertime()+
+                        " contype1 陪练模式 "+g_order.getContype1()+
+                        " ordertype 订单类型 0：排位 1：定位 2：等级 3：陪玩 "+g_order.getOrdertype()+
+                        " boostertype 价格区别标识 代练 "+g_order.getBoostertype()+
+                        " accompanytype 价格区别标识 陪玩 "+g_order.getAccompanytype()+
+                        " currentpar 当前段位 "+g_order.getCurrentpar()+
+                        " targetpar 目标段位 "+g_order.getTargetpar()+
+                        " inscriptiongrade 铭文等级-王者荣耀 "+g_order.getInscriptiongrade()+
+                        " positioningmatch1 上赛季段位 "+g_order.getPositioningmatch1()+
+                        " positioningmatch2 胜场数 "+g_order.getPositioningmatch2()+
+                        " currentgrade 当前等级 "+g_order.getCurrentgrade()+
+                        " targetgrade 目标等级 "+g_order.getTargetgrade()+
+                        " displacementtype 0：单双排 1：灵活组排 -lol "+g_order.getDisplacementtype()+
+                        " issupplement 是否补分 -lol "+g_order.getIssupplement()+
+                        ""
+                );
+
+                List<GameOrder> resG_Order=gameOrderService.selectByOutTradeNo(orderId);
+                if (resG_Order.isEmpty()){
+                    gameOrderService.insertSelective(g_order);
+                }else{
+                    logger.error("！！！！！游戏订单 订单已经存在");
                 }
             }
 
@@ -304,7 +397,7 @@ public class WXController {
                 order.setTransactionId((String)map.get("transaction_id"));
                 order.setTimeEnd((String)map.get("time_end"));
                 order.setState(1);
-                List<WXPayOrder> resOrder=orderService.selectByOutTradeNo((String)map.get("out_trade_no");
+                List<WXPayOrder> resOrder=orderService.selectByOutTradeNo((String)map.get("out_trade_no"));
                 logger.info("order:"+order+"resOrder: "+resOrder +"=="+resOrder.isEmpty()+"openid:"+(String)map.get("openid"));
                 if (resOrder.isEmpty()){
                     //更新订单 成功
@@ -313,6 +406,19 @@ public class WXController {
                     //插入
                     logger.error("！！！！！异常 订单不存在 order"+order);
                     orderService.insertSelective(order);
+                }
+
+
+                //更新业务订单（游戏订单）
+                GameOrder g_order = new GameOrder();
+                //待支付：0 	1：支付成功
+                g_order.setState("1");
+                g_order.setUpdatatime(new Date());
+                List<GameOrder> resG_Order=gameOrderService.selectByOutTradeNo(String.valueOf(map.get("out_trade_no")));
+                if (resG_Order.isEmpty()){
+                    gameOrderService.insertSelective(g_order);
+                }else{
+                    logger.error("！！！！！异常 订单不存在 g_order");
                 }
 
                 //通知微信服务器已经支付成功
