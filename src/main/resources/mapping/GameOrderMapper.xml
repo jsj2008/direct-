@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.direct.mapper.GameOrderMapper" >
+  <resultMap id="BaseResultMap" type="com.direct.model.GameOrder" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="openId" property="openid" jdbcType="VARCHAR" />
+    <result column="orderid" property="orderid" jdbcType="VARCHAR" />
+    <result column="payType" property="paytype" jdbcType="CHAR" />
+    <result column="total_fee" property="totalFee" jdbcType="INTEGER" />
+    <result column="state" property="state" jdbcType="CHAR" />
+    <result column="createdTime" property="createdtime" jdbcType="TIMESTAMP" />
+    <result column="updataTime" property="updatatime" jdbcType="TIMESTAMP" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="trainerTime" property="trainertime" jdbcType="INTEGER" />
+    <result column="conType1" property="contype1" jdbcType="CHAR" />
+    <result column="orderType" property="ordertype" jdbcType="CHAR" />
+    <result column="boosterType" property="boostertype" jdbcType="CHAR" />
+    <result column="accompanyType" property="accompanytype" jdbcType="CHAR" />
+    <result column="currentPar" property="currentpar" jdbcType="INTEGER" />
+    <result column="targetPar" property="targetpar" jdbcType="INTEGER" />
+    <result column="inscriptionGrade" property="inscriptiongrade" jdbcType="INTEGER" />
+    <result column="positioningMatch_1" property="positioningmatch1" jdbcType="INTEGER" />
+    <result column="positioningMatch_2" property="positioningmatch2" jdbcType="INTEGER" />
+    <result column="currentGrade" property="currentgrade" jdbcType="INTEGER" />
+    <result column="targetGrade" property="targetgrade" jdbcType="INTEGER" />
+    <result column="displacementType" property="displacementtype" jdbcType="CHAR" />
+    <result column="isSupplement" property="issupplement" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, openId, orderid, payType, total_fee, state, createdTime, updataTime, phone, trainerTime, 
+    conType1, orderType, boosterType, accompanyType, currentPar, targetPar, inscriptionGrade, 
+    positioningMatch_1, positioningMatch_2, currentGrade, targetGrade, displacementType, 
+    isSupplement
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from game_order
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <!--添加 start-->
+  <select id="selectByOutTradeNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from game_order
+    where orderid = #{orderid,jdbcType=VARCHAR}
+  </select>
+  <update id="updateByNotifySelective" parameterType="com.direct.model.GameOrder" >
+    update game_order
+    <set >
+      <if test="state != null" >
+        state = #{state,jdbcType=CHAR},
+      </if>
+      <if test="updatatime != null" >
+        updataTime = #{updatatime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where orderid = #{orderid,jdbcType=VARCHAR}
+  </update>
+  <!--添加 end-->
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from game_order
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.direct.model.GameOrder" >
+    insert into game_order (id, openId, orderid, 
+      payType, total_fee, state, 
+      createdTime, updataTime, phone, 
+      trainerTime, conType1, orderType, 
+      boosterType, accompanyType, currentPar, 
+      targetPar, inscriptionGrade, positioningMatch_1, 
+      positioningMatch_2, currentGrade, targetGrade, 
+      displacementType, isSupplement)
+    values (#{id,jdbcType=INTEGER}, #{openid,jdbcType=VARCHAR}, #{orderid,jdbcType=VARCHAR}, 
+      #{paytype,jdbcType=CHAR}, #{totalFee,jdbcType=INTEGER}, #{state,jdbcType=CHAR}, 
+      #{createdtime,jdbcType=TIMESTAMP}, #{updatatime,jdbcType=TIMESTAMP}, #{phone,jdbcType=VARCHAR}, 
+      #{trainertime,jdbcType=INTEGER}, #{contype1,jdbcType=CHAR}, #{ordertype,jdbcType=CHAR}, 
+      #{boostertype,jdbcType=CHAR}, #{accompanytype,jdbcType=CHAR}, #{currentpar,jdbcType=INTEGER}, 
+      #{targetpar,jdbcType=INTEGER}, #{inscriptiongrade,jdbcType=INTEGER}, #{positioningmatch1,jdbcType=INTEGER}, 
+      #{positioningmatch2,jdbcType=INTEGER}, #{currentgrade,jdbcType=INTEGER}, #{targetgrade,jdbcType=INTEGER}, 
+      #{displacementtype,jdbcType=CHAR}, #{issupplement,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.direct.model.GameOrder" >
+    insert into game_order
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="openid != null" >
+        openId,
+      </if>
+      <if test="orderid != null" >
+        orderid,
+      </if>
+      <if test="paytype != null" >
+        payType,
+      </if>
+      <if test="totalFee != null" >
+        total_fee,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+      <if test="createdtime != null" >
+        createdTime,
+      </if>
+      <if test="updatatime != null" >
+        updataTime,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="trainertime != null" >
+        trainerTime,
+      </if>
+      <if test="contype1 != null" >
+        conType1,
+      </if>
+      <if test="ordertype != null" >
+        orderType,
+      </if>
+      <if test="boostertype != null" >
+        boosterType,
+      </if>
+      <if test="accompanytype != null" >
+        accompanyType,
+      </if>
+      <if test="currentpar != null" >
+        currentPar,
+      </if>
+      <if test="targetpar != null" >
+        targetPar,
+      </if>
+      <if test="inscriptiongrade != null" >
+        inscriptionGrade,
+      </if>
+      <if test="positioningmatch1 != null" >
+        positioningMatch_1,
+      </if>
+      <if test="positioningmatch2 != null" >
+        positioningMatch_2,
+      </if>
+      <if test="currentgrade != null" >
+        currentGrade,
+      </if>
+      <if test="targetgrade != null" >
+        targetGrade,
+      </if>
+      <if test="displacementtype != null" >
+        displacementType,
+      </if>
+      <if test="issupplement != null" >
+        isSupplement,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="openid != null" >
+        #{openid,jdbcType=VARCHAR},
+      </if>
+      <if test="orderid != null" >
+        #{orderid,jdbcType=VARCHAR},
+      </if>
+      <if test="paytype != null" >
+        #{paytype,jdbcType=CHAR},
+      </if>
+      <if test="totalFee != null" >
+        #{totalFee,jdbcType=INTEGER},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=CHAR},
+      </if>
+      <if test="createdtime != null" >
+        #{createdtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatatime != null" >
+        #{updatatime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="trainertime != null" >
+        #{trainertime,jdbcType=INTEGER},
+      </if>
+      <if test="contype1 != null" >
+        #{contype1,jdbcType=CHAR},
+      </if>
+      <if test="ordertype != null" >
+        #{ordertype,jdbcType=CHAR},
+      </if>
+      <if test="boostertype != null" >
+        #{boostertype,jdbcType=CHAR},
+      </if>
+      <if test="accompanytype != null" >
+        #{accompanytype,jdbcType=CHAR},
+      </if>
+      <if test="currentpar != null" >
+        #{currentpar,jdbcType=INTEGER},
+      </if>
+      <if test="targetpar != null" >
+        #{targetpar,jdbcType=INTEGER},
+      </if>
+      <if test="inscriptiongrade != null" >
+        #{inscriptiongrade,jdbcType=INTEGER},
+      </if>
+      <if test="positioningmatch1 != null" >
+        #{positioningmatch1,jdbcType=INTEGER},
+      </if>
+      <if test="positioningmatch2 != null" >
+        #{positioningmatch2,jdbcType=INTEGER},
+      </if>
+      <if test="currentgrade != null" >
+        #{currentgrade,jdbcType=INTEGER},
+      </if>
+      <if test="targetgrade != null" >
+        #{targetgrade,jdbcType=INTEGER},
+      </if>
+      <if test="displacementtype != null" >
+        #{displacementtype,jdbcType=CHAR},
+      </if>
+      <if test="issupplement != null" >
+        #{issupplement,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.direct.model.GameOrder" >
+    update game_order
+    <set >
+      <if test="openid != null" >
+        openId = #{openid,jdbcType=VARCHAR},
+      </if>
+      <if test="orderid != null" >
+        orderid = #{orderid,jdbcType=VARCHAR},
+      </if>
+      <if test="paytype != null" >
+        payType = #{paytype,jdbcType=CHAR},
+      </if>
+      <if test="totalFee != null" >
+        total_fee = #{totalFee,jdbcType=INTEGER},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=CHAR},
+      </if>
+      <if test="createdtime != null" >
+        createdTime = #{createdtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatatime != null" >
+        updataTime = #{updatatime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="trainertime != null" >
+        trainerTime = #{trainertime,jdbcType=INTEGER},
+      </if>
+      <if test="contype1 != null" >
+        conType1 = #{contype1,jdbcType=CHAR},
+      </if>
+      <if test="ordertype != null" >
+        orderType = #{ordertype,jdbcType=CHAR},
+      </if>
+      <if test="boostertype != null" >
+        boosterType = #{boostertype,jdbcType=CHAR},
+      </if>
+      <if test="accompanytype != null" >
+        accompanyType = #{accompanytype,jdbcType=CHAR},
+      </if>
+      <if test="currentpar != null" >
+        currentPar = #{currentpar,jdbcType=INTEGER},
+      </if>
+      <if test="targetpar != null" >
+        targetPar = #{targetpar,jdbcType=INTEGER},
+      </if>
+      <if test="inscriptiongrade != null" >
+        inscriptionGrade = #{inscriptiongrade,jdbcType=INTEGER},
+      </if>
+      <if test="positioningmatch1 != null" >
+        positioningMatch_1 = #{positioningmatch1,jdbcType=INTEGER},
+      </if>
+      <if test="positioningmatch2 != null" >
+        positioningMatch_2 = #{positioningmatch2,jdbcType=INTEGER},
+      </if>
+      <if test="currentgrade != null" >
+        currentGrade = #{currentgrade,jdbcType=INTEGER},
+      </if>
+      <if test="targetgrade != null" >
+        targetGrade = #{targetgrade,jdbcType=INTEGER},
+      </if>
+      <if test="displacementtype != null" >
+        displacementType = #{displacementtype,jdbcType=CHAR},
+      </if>
+      <if test="issupplement != null" >
+        isSupplement = #{issupplement,jdbcType=CHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.direct.model.GameOrder" >
+    update game_order
+    set openId = #{openid,jdbcType=VARCHAR},
+      orderid = #{orderid,jdbcType=VARCHAR},
+      payType = #{paytype,jdbcType=CHAR},
+      total_fee = #{totalFee,jdbcType=INTEGER},
+      state = #{state,jdbcType=CHAR},
+      createdTime = #{createdtime,jdbcType=TIMESTAMP},
+      updataTime = #{updatatime,jdbcType=TIMESTAMP},
+      phone = #{phone,jdbcType=VARCHAR},
+      trainerTime = #{trainertime,jdbcType=INTEGER},
+      conType1 = #{contype1,jdbcType=CHAR},
+      orderType = #{ordertype,jdbcType=CHAR},
+      boosterType = #{boostertype,jdbcType=CHAR},
+      accompanyType = #{accompanytype,jdbcType=CHAR},
+      currentPar = #{currentpar,jdbcType=INTEGER},
+      targetPar = #{targetpar,jdbcType=INTEGER},
+      inscriptionGrade = #{inscriptiongrade,jdbcType=INTEGER},
+      positioningMatch_1 = #{positioningmatch1,jdbcType=INTEGER},
+      positioningMatch_2 = #{positioningmatch2,jdbcType=INTEGER},
+      currentGrade = #{currentgrade,jdbcType=INTEGER},
+      targetGrade = #{targetgrade,jdbcType=INTEGER},
+      displacementType = #{displacementtype,jdbcType=CHAR},
+      isSupplement = #{issupplement,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
