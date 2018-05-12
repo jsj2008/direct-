@@ -49,6 +49,8 @@ public class GameOrder_param {
 
     private String issupplement;
 
+    private String gametype;
+
     public Integer getId() {
         return id;
     }
@@ -231,5 +233,13 @@ public class GameOrder_param {
 
     public void setIssupplement(String issupplement) {
         this.issupplement = issupplement == null ? null : issupplement.trim();
+    }
+
+    public String getGametype() {
+        return gametype;
+    }
+
+    public void setGametype(String gametype) {
+        this.gametype = gametype;
     }
 }
