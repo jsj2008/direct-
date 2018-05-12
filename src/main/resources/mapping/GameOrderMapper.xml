@@ -25,12 +25,13 @@
     <result column="targetGrade" property="targetgrade" jdbcType="INTEGER" />
     <result column="displacementType" property="displacementtype" jdbcType="CHAR" />
     <result column="isSupplement" property="issupplement" jdbcType="CHAR" />
+    <result column="gameType" property="gametype" jdbcType="CHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, openId, orderid, payType, total_fee, state, createdTime, updataTime, phone, trainerTime, 
     conType1, orderType, boosterType, accompanyType, currentPar, targetPar, inscriptionGrade, 
     positioningMatch_1, positioningMatch_2, currentGrade, targetGrade, displacementType, 
-    isSupplement
+    isSupplement, gameType
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -70,7 +71,8 @@
       boosterType, accompanyType, currentPar, 
       targetPar, inscriptionGrade, positioningMatch_1, 
       positioningMatch_2, currentGrade, targetGrade, 
-      displacementType, isSupplement)
+      displacementType, isSupplement, gameType
+      )
     values (#{id,jdbcType=INTEGER}, #{openid,jdbcType=VARCHAR}, #{orderid,jdbcType=VARCHAR}, 
       #{paytype,jdbcType=CHAR}, #{totalFee,jdbcType=INTEGER}, #{state,jdbcType=CHAR}, 
       #{createdtime,jdbcType=TIMESTAMP}, #{updatatime,jdbcType=TIMESTAMP}, #{phone,jdbcType=VARCHAR}, 
@@ -78,7 +80,8 @@
       #{boostertype,jdbcType=CHAR}, #{accompanytype,jdbcType=CHAR}, #{currentpar,jdbcType=INTEGER}, 
       #{targetpar,jdbcType=INTEGER}, #{inscriptiongrade,jdbcType=INTEGER}, #{positioningmatch1,jdbcType=INTEGER}, 
       #{positioningmatch2,jdbcType=INTEGER}, #{currentgrade,jdbcType=INTEGER}, #{targetgrade,jdbcType=INTEGER}, 
-      #{displacementtype,jdbcType=CHAR}, #{issupplement,jdbcType=CHAR})
+      #{displacementtype,jdbcType=CHAR}, #{issupplement,jdbcType=CHAR}, #{gametype,jdbcType=CHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.direct.model.GameOrder" >
     insert into game_order
@@ -152,6 +155,9 @@
       <if test="issupplement != null" >
         isSupplement,
       </if>
+      <if test="gametype != null" >
+        gameType,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -222,6 +228,9 @@
       </if>
       <if test="issupplement != null" >
         #{issupplement,jdbcType=CHAR},
+      </if>
+      <if test="gametype != null" >
+        #{gametype,jdbcType=CHAR},
       </if>
     </trim>
   </insert>
@@ -294,6 +303,9 @@
       <if test="issupplement != null" >
         isSupplement = #{issupplement,jdbcType=CHAR},
       </if>
+      <if test="gametype != null" >
+        gameType = #{gametype,jdbcType=CHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -320,7 +332,8 @@
       currentGrade = #{currentgrade,jdbcType=INTEGER},
       targetGrade = #{targetgrade,jdbcType=INTEGER},
       displacementType = #{displacementtype,jdbcType=CHAR},
-      isSupplement = #{issupplement,jdbcType=CHAR}
+      isSupplement = #{issupplement,jdbcType=CHAR},
+      gameType = #{gametype,jdbcType=CHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>
