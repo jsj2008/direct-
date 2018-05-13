@@ -11,26 +11,41 @@
             <!-- 是否去除自动生成的注释 true：是 ： false:否 -->
             <property name="suppressAllComments" value="true"/>
         </commentGenerator>
+        <!--&lt;!&ndash; 生成一对一配置 &ndash;&gt;-->
+        <!--<plugin type="cc.bandaotixi.plugins.OneToOnePlugin" />-->
+        <!--&lt;!&ndash; 生成一对多配置 &ndash;&gt;-->
+        <!--<plugin type="cc.bandaotixi.plugins.OneToManyPlugin" />-->
+        <!--&lt;!&ndash; 生成批量配置 &ndash;&gt;-->
+        <!--<plugin type="cc.bandaotixi.plugins.BatchInsertPlugin" />-->
+        <!--<plugin type="cc.bandaotixi.plugins.BatchUpdatePlugin" />-->
         <!--数据库链接URL，用户名、密码 -->
         <jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://127.0.0.1/direct" userId="root" password="123456">
         </jdbcConnection>
         <javaTypeResolver>
             <property name="forceBigDecimals" value="false"/>
         </javaTypeResolver>
-        <!-- 生成模型的包名和位置-->
+        <!-- 数据表对应的实体层-->
         <javaModelGenerator targetPackage="com.direct.model" targetProject="src/main/java">
             <property name="enableSubPackages" value="true"/>
             <property name="trimStrings" value="true"/>
         </javaModelGenerator>
-        <!-- 生成映射文件的包名和位置-->
+        <!-- 生成映射文件的包名和位置 mapper.xml配置-->
         <sqlMapGenerator targetPackage="mapping" targetProject="src/main/resources">
             <property name="enableSubPackages" value="true"/>
         </sqlMapGenerator>
-        <!-- 生成DAO的包名和位置-->
+        <!-- 在ibatis2 中是dao层，但在mybatis3中，其实就是mapper接口-->
         <javaClientGenerator type="XMLMAPPER" targetPackage="com.direct.mapper" targetProject="src/main/java">
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
         <!-- 要生成的表 tableName是数据库中的表名或视图名 domainObjectName是实体类名-->
-        <table tableName="wx_pay_order" domainObjectName="WXPayOrder" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
+        <!--<table tableName="wx_pay_order" domainObjectName="WXPayOrder">-->
+            <!--<generatedKey column="orderid" sqlStatement="MySql" identity="true" />-->
+            <!--<oneToOne mappingTable="game_order" column="orderid" joinColumn="orderid"  />-->
+        <!--</table>-->
+        <!-- 关联表配置-->
+        <!--<table tableName="game_order" domainObjectName="GameOrder">-->
+            <!--<generatedKey column="orderid" sqlStatement="MySql" identity="true" />-->
+        <!--</table>-->
+        <table tableName="paragraph_2" domainObjectName="paragraphLOL" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
     </context>
 </generatorConfiguration>
